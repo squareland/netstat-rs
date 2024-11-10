@@ -1,8 +1,8 @@
-use integrations::linux::ffi::*;
 use libc::*;
 use std;
 use std::mem::size_of;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+use integrations::linux::ffi::{__be32, INET_DIAG_INFO, inet_diag_msg, inet_diag_req_v2, rtattr, SOCK_DIAG_BY_FAMILY};
 use types::*;
 use utils::*;
 
@@ -143,7 +143,7 @@ unsafe fn parse_tcp_state(diag_msg: &inet_diag_msg, rtalen: usize) -> TcpState {
     while RTA_OK!(attr, len) {
         if (&*attr).rta_type == INET_DIAG_INFO as u16 {
             let tcpi = &*(RTA_DATA!(attr) as *const tcp_info);
-            return TcpState::from(tcpi.state);
+            return TcpState::from(tcpi.tcpi_state);
         }
         attr = RTA_NEXT!(attr, len);
     }
